@@ -1,0 +1,31 @@
+
+###exportPattern("^[^\\.]")
+
+export(cholx, cholPosDef, Print, solvex, solvePosDef, chol2mv, tcholRHS,
+       crossprodx,
+       colMax, rowMeansx, rowProd, SelfDivByRow, quadratic, dotXV,
+       sleep.milli, sleep.micro,
+       hostname, pid, cpus, threads, cores, cores1,
+       FileExists, LockRemove, WaitOthers,
+       sortx, orderx,
+       gauss, matern, nonstwm, whittle,
+       I0L0, struveH, struveL,
+       # besselKx,
+       RFoptions, confirm,
+       checkExamples,
+       dbinorm)
+exportPattern("^PIVOT_")
+
+useDynLib(RandomFieldsUtils, .registration = TRUE, .fixes = "C_")
+#useDynLib(spam)
+
+importFrom("utils", "str", "packageDescription", "contrib.url", "read.table")
+importFrom("methods", "hasArg", "is")
+importFrom("grDevices", "dev.off")
+
+S3method(print, RFopt)
+S3method(summary, RFopt)
+S3method(print, summary.RFopt)
+S3method(print, RFoptElmnt)
+S3method(summary, RFoptElmnt)
+S3method(print, summary.RFoptElmnt)
