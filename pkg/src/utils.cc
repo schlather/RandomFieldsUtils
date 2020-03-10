@@ -107,9 +107,15 @@ SEXP DivByRow(SEXP M, SEXP V) {
 
 #define algn_general(X)  ((1L + (uintptr_t) (((uintptr_t) X - 1L) / BytesPerBlock)) * BytesPerBlock)
 
-double static inline *algn(double *X) {assert(algn_general(X)>=(uintptr_t)X); return (double *) algn_general(X); }
+double static inline *algn(double *X) {
+  assert(algn_general(X)>=(uintptr_t)X); return (double *) algn_general(X);
+}
 
-int static inline *algnInt(int *X) {assert(algn_general(X)>=(uintptr_t)X); return (int *) algn_general(X); }
+#if defined SSE4 || defined AVX2
+int static inline *algnInt(int *X) {
+  assert(algn_general(X)>=(uintptr_t)X); return (int *) algn_general(X);
+}
+#endif
 
 
 
@@ -134,8 +140,8 @@ void colMaxsIint(int *M, int r, int c, int *ans) {
        *end = m + r;
     uintptr_t End = (uintptr_t) (end - integers);
     if ((uintptr_t) start < End) {
-      BlockType *m0 = (BlockType*) start,
-	Dummy = LOAD((BlockType*) m0);
+      BlockType *m0 = (BlockType0*) start,
+	Dummy = LOAD((BlockType0*) m0);
       for (m0++ ; (uintptr_t) m0 < End; m0++) {
 	Dummy = MAXINTEGER(Dummy, LOAD(m0));
       }
@@ -188,9 +194,9 @@ void colMaxsI(double *M, int r, int c, double *ans) {
     uintptr_t End = (uintptr_t) (end - doubles);
     if ((uintptr_t) start < End) {
       Double * m0 = (Double*) start,
-	Dummy = (Double) LOAD((UBlockType*) m0);
+	Dummy = (Double) LOAD((BlockType0*) m0);
       for (m0++ ; (uintptr_t) m0 < End; m0++) {
-	Dummy = MAXDOUBLE(Dummy, (Double) LOAD((UBlockType*) m0));
+	Dummy = MAXDOUBLE(Dummy, (Double) LOAD((BlockType0*) m0));
       }
       double *d = (double *) &Dummy;
       dummy = d[0];

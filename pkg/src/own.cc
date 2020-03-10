@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <R.h>
 #include <Rinternals.h>
 #include "General_utils.h"
-#include "own.h"
+#include "own.h" // vor zzz_RandomFieldsUtils.h
 #include "Utils.h"
 #include "intrinsics.h"
 #include "zzz_RandomFieldsUtils.h" // always last

@@ -171,15 +171,16 @@ extern "C" {
 #define HAS_ONE_RELEVANT (HAS_PARALLEL || (HAS_AVX2 && AVX2_USED) || (HAS_AVX && AVX_USED) || (HAS_SSSE3 && SSSE3_USED) ||  HAS_SSE2 || HAS_SSE)
 #define HAS_ALL_RELEVANT (HAS_PARALLEL && (HAS_AVX2 || !AVX2_USED) && (HAS_AVX || !AVX_USED) && (HAS_SSSE3 || !SSSE3_USED) &&  HAS_SSE2 && HAS_SSE)
 
-#define AttachMessage(PKG, HINT)					\
-  "'"#PKG"' %.20s %.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s.%.320s%.120s%.120s", \
+#ifdef WIN32
+#define AttachMessageX(PKG, HINT, AND)					\
+  "'"#PKG"' %.20s %.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s.%.320s%.120s", \
     HAS_ONE_RELEVANT ? "sees" : "does not see any of",			\
-    HAS_PARALLEL ? "OMP, " : "",					\
-    HAS_AVX2 && AVX2_USED ? "AVX2, " : "",				\
-    HAS_AVX && AVX_USED ? "AVX, " : "",					\
-    HAS_SSSE3 && SSSE3_USED ? "SSSE3, " : "",				\
-    HAS_SSE2 && SSE2_USED ? "SSE2, " : "",				\
-    HAS_SSE && SSE_USED ? "SSE, " : "",					\
+    HAS_PARALLEL ? "OMP" : "",					\
+    HAS_AVX2 && AVX2_USED ? ", AVX2" : "",				\
+    HAS_AVX && AVX_USED ? ", AVX" : "",					\
+    HAS_SSSE3 && SSSE3_USED ? ", SSSE3" : "",				\
+    HAS_SSE2 && SSE2_USED ? ", SSE2" : "",				\
+    HAS_SSE && SSE_USED ? ", SSE" : "",					\
     !HAS_ONE_RELEVANT || HAS_ALL_RELEVANT ? "" : "but not ",		\
     !HAS_PARALLEL ? "OMP, " : "",					\
     !HAS_AVX2 && AVX2_USED ? "AVX2" : "",				\
@@ -187,22 +188,49 @@ extern "C" {
     !HAS_SSSE3 && SSSE3_USED ? ", SSSE3" : "",				\
     !HAS_SSE2 && SSE2_USED ? ", SSE2" : "",				\
     !HAS_SSE && SSE_USED ? ", SSE" : "",				\
-    HINT && ((!HAS_AVX2 && AVX2_USED) || (!HAS_AVX && AVX_USED) || !HAS_SSE2) ? "\nNote that without appropriate SIMD the calculations become slow.\nConsider recompiling '"#PKG"' and 'RandomFieldsUtils' with flags e.g.,\n  install.packages(\""#PKG"\", configure.args=\"CXX_FLAGS=-march=native\")" : "", \
+    HINT && ((!HAS_AVX2 && AVX2_USED) || (!HAS_AVX && AVX_USED) || !HAS_SSE2) ? "\nBy default '"#PKG"' is compiled with flag '-mavx' under your OS.\nIf you are sure that AVX2 is available, consider adding the flag '-march=native'\nto 'PKG_CXXFLAGS' in the file src/Makefile.win and then recompile\n'"#PKG"' "#AND"." : "", \
     HINT && (!HAS_AVX2 && AVX2_USED) ?					\
-    "\n  install.packages(\""#PKG"\", configure.args=\"CXX_FLAGS=-mavx2\")" \
+    "\nOr: try adding flag '-mavx2' to 'PKG_CXXFLAGS'" : ""
+#else
+#define AttachMessageX(PKG, HINT, AND) 				\
+  "'"#PKG"' %.20s %.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s%.10s.%.320s%.120s%.120s%.350s", \
+    HAS_ONE_RELEVANT ? "sees" : "does not see any of",			\
+    HAS_PARALLEL ? "OMP" : "",						\
+    HAS_AVX2 && AVX2_USED ? ", AVX2" : "",				\
+    HAS_AVX && AVX_USED ? ", AVX" : "",					\
+    HAS_SSSE3 && SSSE3_USED ? ", SSSE3" : "",				\
+    HAS_SSE2 && SSE2_USED ? ", SSE2" : "",				\
+    HAS_SSE && SSE_USED ? ", SSE" : "",					\
+    !HAS_ONE_RELEVANT || HAS_ALL_RELEVANT ? "" : ", but not ",		\
+    !HAS_PARALLEL ? "OMP, " : "",					\
+    !HAS_AVX2 && AVX2_USED ? "AVX2" : "",				\
+    !HAS_AVX && AVX_USED ? ", AVX" : "",				\
+    !HAS_SSSE3 && SSSE3_USED ? ", SSSE3" : "",				\
+    !HAS_SSE2 && SSE2_USED ? ", SSE2" : "",				\
+    !HAS_SSE && SSE_USED ? ", SSE" : "",				\
+    HINT && ((!HAS_AVX2 && AVX2_USED) || (!HAS_AVX && AVX_USED) || !HAS_SSE2) ? "\nWithout appropriate SIMD instruction set, the calculations might be slow.\nConsider recompiling '"#PKG"' "#AND" with flags e.g.,\n install.packages(\""#PKG"\", configure.args=\"CXX_FLAGS=-march=native\")" : "", \
+    HINT && (!HAS_AVX2 && AVX2_USED) ?					\
+    "\n install.packages(\""#PKG"\", configure.args=\"CXX_FLAGS=-mavx2\")" \
     : "",								\
     HINT && (!HAS_AVX && AVX_USED) ?					\
-    "\n  install.packages(\""#PKG"\" , configure.args=\"CXX_FLAGS=-mavx\")"\
-    : ""							
+    "\n install.packages(\""#PKG"\" , configure.args=\"CXX_FLAGS=-mavx\")"\
+    : "",								\
+    HINT && ((!HAS_AVX2 && AVX2_USED) || (!HAS_AVX && AVX_USED) || !HAS_SSE2) ? "\nAlternatively consider installing '"#PKG"'\nfrom https://github.com/schlather/"#PKG", i.e.,\n   install.packages(\"devtools\")\n   library(devtools)\n   devtools::install_github(\"schlather/"#PKG"/pkg\")" : ""
+#endif
 
+#if defined ownprefixN
+#define AttachMessage(PKG, HINT)  AttachMessageX(PKG, HINT, )
+#else
+#define AttachMessage(PKG, HINT)  AttachMessageX(PKG, HINT,\
+						 and 'RandomFieldsUtils' )
+#endif
+  
 #define ReturnAttachMessage(PKG,HINT) 	\
   SEXP Ans = PROTECT(allocVector(STRSXP, 1));	\
   char simd_msg[AttachMessageN];			\
-  SPRINTF(simd_msg, AttachMessage(PKG,HINT)); 	\
+  SPRINTF(simd_msg, AttachMessage(PKG,HINT)); \
   SET_STRING_ELT(Ans, 0, mkChar(simd_msg));		\
   UNPROTECT(1);						\
   return Ans;
 
 #endif
-
-      

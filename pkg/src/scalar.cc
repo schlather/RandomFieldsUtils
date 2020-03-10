@@ -4,6 +4,7 @@
  Martin Schlather, schlather@math.uni-mannheim.de
 
  Collection of system specific auxiliary functions
+ 'scalar' etc have slightly lower precision than R has.
 
  Copyright (C) 2001 -- 2017 Martin Schlather, 
 
@@ -344,8 +345,9 @@ double scalarX(double *x, double *y, int len, int n) {
   case 1 : return scalarprod2by2(x, y, len); 
   case SCALAR_BASE : return scalarprod4by4(x, y, len); 
   case 3 : return scalarprod8by8(x, y, len); 
+  case 4 :
 #ifdef FMA_AVAILABLE
-  case 4 : return avx_scalarprodDfma(x, y, len);
+    return avx_scalarprodDfma(x, y, len);
 #endif    
 #ifdef AVX
   case SCALAR_NEARFMA : return avx_scalarprodDnearfma(x, y, len); 
@@ -353,7 +355,7 @@ double scalarX(double *x, double *y, int len, int n) {
   case 7 : return avx_scalarprodDP(x, y, len);  //best
   case SCALAR_KAHAN : return avx_scalarprodDK(x, y, len); // kahan
 #else
-  case4: case 5: case 6: case 7: case 8 : return scalarprod4by4(x, y, len);
+  case 5: case 6: case 7: case 8 : return scalarprod4by4(x, y, len);
 #endif
     
 #ifdef DO_PARALLEL_XXXX_DO_NOT_USE
@@ -413,7 +415,7 @@ SEXP crossprodX(SEXP X, SEXP Y, SEXP mode) {
     lenY = nrows(Y);
   } else {
     ncol = 1;
-    len = length(Y);
+    lenY = length(Y);
   }
   if (lenY != len) ERR("sizes of 'x' and 'y' do not match");
   if (length(mode) == 0) n = SCALAR_DEFAULT;
@@ -433,9 +435,10 @@ SEXP crossprodX(SEXP X, SEXP Y, SEXP mode) {
 #endif
     for (int i=0; i<nrow; i++) {    
       double *C = ans + i,
+	*ansNrow = ans + i * nrow,
 	*Aim = x + i * len;
       for (int j=i; j<ncol; j++)
-	ans[j + i * nrow] = C[j * nrow] = scalarX(Aim, y + j * len, len, n);
+	ansNrow[j] = C[j * nrow] = scalarX(Aim, y + j * len, len, n);
     }
   }
   else {
@@ -445,7 +448,8 @@ SEXP crossprodX(SEXP X, SEXP Y, SEXP mode) {
     for (int i=0; i<nrow; i++) {    
       double *C = ans + i,
 	*Aim = x + i * len;
-      for (int j=0; j<ncol; j++) C[j * nrow] = scalarX(Aim, y + j * len, len, n);
+      for (int j=0; j<ncol; j++)
+	C[j * nrow] = scalarX(Aim, y + j * len, len, n);
     }
   }
   UNPROTECT(1);

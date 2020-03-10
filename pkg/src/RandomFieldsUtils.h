@@ -74,13 +74,6 @@ extern "C" {
   void Ordering(double *d, int *len, int *dim, int *pos);
   SEXP crossprodX(SEXP X, SEXP Y, SEXP mode);
 
-
-  
-#ifdef SCHLATHERS_MACHINE
-  //  SEXP scalarX(SEXP x, SEXP y, SEXP mode);
-  //  SEXP brdomain(SEXP Srf, SEXP Sgamma, SEXP Sinstances, SEXP Smaxn);
-#endif
-
 #ifdef __cplusplus
 }
 #endif

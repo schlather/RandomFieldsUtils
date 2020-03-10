@@ -188,8 +188,8 @@ typedef enum usr_bool {
 
 
 typedef unsigned int Uint;
-typedef uint64_t  Ulong;
-typedef int64_t  Long;
+typedef uint64_t Ulong;
+typedef int64_t Long;
 
 #define PRINTF Rprintf //
 #ifdef SCHLATHERS_MACHINE

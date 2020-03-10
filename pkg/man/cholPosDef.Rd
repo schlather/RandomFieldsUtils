@@ -73,7 +73,7 @@ Else the Cholesky decomposition is tried.
 \examples{
 
 if (FALSE) {
-## This examples shows that 'cholesky' can be much faster
+## This examples shows that 'cholx' can be much faster
 ## than 'chol'
 
 ## creating a covariance matrix for a temporal process

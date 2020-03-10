@@ -95,7 +95,7 @@
 
 #if defined AVX
 #define BytesPerBlock 32
-#define UBlockType __m256i 
+#define BlockType0 __m256i 
 #define BlockType __m256i ALIGNED
 #define Double __m256d
 #define MAXDOUBLE _mm256_max_pd
@@ -112,7 +112,7 @@
 
 #elif defined SSE2
 #define BytesPerBlock 16
-#define UBlockType __m128i
+#define BlockType0 __m128i
 #define BlockType __m128i ALIGNED
 #define Double __m128d
 #define MAXDOUBLE _mm_max_pd
@@ -145,5 +145,4 @@
 
 
 #endif
-
 

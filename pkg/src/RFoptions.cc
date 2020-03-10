@@ -81,7 +81,8 @@ void setparameter(SEXP el, char *prefix, char *mainname, bool isList,
     ListNr = NOMATCHING;
   char name[LEN_OPTIONNAME];
 
-  SPRINTF(name, "%.50s%.50s%.50s", prefix, STRLEN(prefix)==0 ? "" : ".", mainname);
+  SPRINTF(name, "%.50s%.50s%.50s", prefix, STRLEN(prefix)==0 ? "" : ".",
+	  mainname);
 
   if (STRCMP(prefix, "")) {
     for (ListNr=0; ListNr<NList; ListNr++) {
